@@ -24,4 +24,7 @@ public class Cuota {
 
     @Column(nullable = false)
     private boolean pagada;
+
+    @Column(nullable = false)
+    private double montoInteres;
 }
