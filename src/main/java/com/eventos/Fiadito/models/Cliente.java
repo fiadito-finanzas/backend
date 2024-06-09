@@ -26,4 +26,7 @@ public class Cliente {
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private CuentaCorriente cuentaCorriente;
+
+    @Column(nullable = false)
+    private boolean enMora = false;
 }

@@ -23,4 +23,10 @@ public class ConfiguracionCredito {
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date fechaPagoMensual;
+
+    @Column(nullable = false)
+    private boolean esTasaNominal;
+
+    @Column(nullable = false)
+    private int periodoCapitalizacion;
 }
