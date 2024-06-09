@@ -1,5 +1,6 @@
 package com.eventos.Fiadito;
 
+import com.eventos.Fiadito.repositories.AuthorityRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -17,7 +18,7 @@ public class FiaditoApplication {
 
 	@Bean
 	public CommandLineRunner mappingApplication(
-
+			AuthorityRepository authorityRepository
 	){
 		return args -> {
 		};
