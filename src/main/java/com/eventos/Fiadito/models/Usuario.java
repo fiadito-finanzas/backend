@@ -16,5 +16,11 @@ public class Usuario {
     private String password;
 
     @Column(nullable = false)
-    private String role; // Role can be ADMIN, USER, etc.
+    private String role;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String nombre;
 }
