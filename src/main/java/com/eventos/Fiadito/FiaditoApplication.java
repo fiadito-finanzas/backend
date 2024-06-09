@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 @EntityScan("com.eventos.Fiadito.models")
 @EnableAutoConfiguration
 public class FiaditoApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(FiaditoApplication.class, args);
 	}
