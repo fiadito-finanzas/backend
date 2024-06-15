@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class Transaccion {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,11 +24,11 @@ public class Transaccion {
     private double monto;
 
     @Column(nullable = false)
-    private String tipo; // Puede ser COMPRA, PAGO o COMPRA_A_CUOTAS
+    private String tipo; // Puede ser COMPRA, PAGO_DEUDA, o COMPRA_A_CUOTAS
 
     @Column(nullable = false)
     private double interes; // Interés aplicado a la transacción, si corresponde
 
-    @OneToMany(mappedBy = "transaccion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Cuota> cuotas;
+    @Column(nullable = false)
+    private double totalMonto; // Monto total de la transacción, incluyendo intereses, si corresponde
 }

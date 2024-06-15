@@ -43,4 +43,18 @@ public class UsuarioController {
         return new ResponseEntity<>(authenticationService.login(userAuthDTO), HttpStatus.OK);
     }
 
+    //Login
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserAuthDTO userAuthDTO) {
+        try {
+            return ResponseEntity.ok(authenticationService.login(userAuthDTO));
+        } catch (AuthenticationServiceException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+    //Logout
+
+
+
 }

@@ -16,6 +16,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     public UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO) {
+
+        // Validar que no existe el usuario
+        Usuario usuarioExistente = usuarioRepository.findByUsername(usuarioDTO.getUsername());
+
+
         Usuario usuario = new Usuario();
         usuario.setUsername(usuarioDTO.getUsername());
         usuario.setPassword(usuarioDTO.getPassword());

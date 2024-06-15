@@ -11,4 +11,13 @@ public interface EstablecimientoService {
 
     EstablecimientoDTO registrarEstablecimiento(EstablecimientoDTO establecimiento);
     //Establecimiento obtenerEstablecimientoPorId(Long establecimientoId);
+
+    //TODO: Actualizar datos establecimiento
+    EstablecimientoDTO actualizarEstablecimiento(EstablecimientoDTO establecimiento);
+
+    //TODO: Eliminar establecimiento
+    boolean eliminarEstablecimiento(Long establecimientoId);
+
+    //TODO: Obtener establecimiento
+    EstablecimientoDTO obtenerEstablecimiento(Long establecimientoId);
 }

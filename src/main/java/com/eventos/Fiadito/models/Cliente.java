@@ -2,6 +2,7 @@ package com.eventos.Fiadito.models;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import lombok.Data;
 
 import java.util.Date;
@@ -23,6 +24,7 @@ public class Cliente {
     private String telefono;
 
     @Column(nullable = false, unique = true)
+    @Max(8)
     private String dni;
 
     @Column(nullable = false)
@@ -41,4 +43,8 @@ public class Cliente {
 
     @Column(nullable = false)
     private boolean enMora = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 }

@@ -20,4 +20,16 @@ public class Establecimiento {
 
     @OneToMany(mappedBy = "establecimiento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cliente> clientes;
+
+    @Column(nullable = false)
+    private String direccion;
+
+    @Column(nullable = false)
+    private String rubro;
+
+    @Column(nullable = false)
+    private String ciudad;
+
+    @Column(nullable = false)
+    private String provincia;
 }

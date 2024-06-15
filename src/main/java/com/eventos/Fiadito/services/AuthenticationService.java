@@ -9,4 +9,6 @@ public interface AuthenticationService {
     public AuthResponseDTO login(UserAuthDTO userAuthDTO);
 
     public void loginSuccess(UserAuthDTO userAuthDTO);
+
+
 }

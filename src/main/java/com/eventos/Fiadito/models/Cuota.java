@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class Cuota {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,4 +27,19 @@ public class Cuota {
 
     @Column(nullable = false)
     private double montoInteres;
+
+    @Column(nullable = false)
+    private double montoAmortizacion;
+
+    @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
+    private Date fechaInicioCiclo;
+
+    @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
+    private Date fechaFinCiclo;
+
+    @Column(nullable = false)
+    private String periodoGracia; // 'T' - 'P' - 'S'
+
 }
