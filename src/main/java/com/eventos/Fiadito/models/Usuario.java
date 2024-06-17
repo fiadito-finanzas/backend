@@ -18,9 +18,6 @@ public class Usuario {
     private String password;
 
     @Column(nullable = false)
-    private String role;
-
-    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -37,5 +34,16 @@ public class Usuario {
             }
     )
     private List<Authority> authorities;
+
+    public Usuario() {
+    }
+
+    public Usuario(String username, String password, String email, String nombre, List<Authority> authorities) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.nombre = nombre;
+        this.authorities = authorities;
+    }
 
 }

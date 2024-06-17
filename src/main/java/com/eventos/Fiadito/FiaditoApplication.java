@@ -1,5 +1,7 @@
 package com.eventos.Fiadito;
 
+import com.eventos.Fiadito.models.Authority;
+import com.eventos.Fiadito.models.AuthorityName;
 import com.eventos.Fiadito.repositories.AuthorityRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,6 +23,8 @@ public class FiaditoApplication {
 			AuthorityRepository authorityRepository
 	){
 		return args -> {
+			authorityRepository.save(new Authority(AuthorityName.ROLE_ESTABLECIMIENTO));
+			authorityRepository.save(new Authority(AuthorityName.ROLE_CLIENTE));
 		};
 	}
 }

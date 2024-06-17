@@ -40,6 +40,9 @@ public class UsuarioController {
     private JwtService jwtService;
     @PostMapping("/auth/login")
     public ResponseEntity<AuthResponseDTO> authenticate(@RequestBody UserAuthDTO userAuthDTO) {
+        if (userAuthDTO.getUsername() == null || userAuthDTO.getPassword() == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(authenticationService.login(userAuthDTO), HttpStatus.OK);
     }
 

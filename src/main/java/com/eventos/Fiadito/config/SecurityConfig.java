@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,11 +27,18 @@ public class SecurityConfig {
                 //Medida de seguridad para agregar a las medidas POST basado en un Token CSRF válido
                 .csrf(csrf ->
                         csrf.disable())
-                .cors(cors -> cors
-                        .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+                .cors(cors ->
+                        cors.configurationSource(request -> {
+                            CorsConfiguration corsConfiguration = new CorsConfiguration();
+                            corsConfiguration.addAllowedOrigin("*");
+                            corsConfiguration.addAllowedMethod("*");
+                            corsConfiguration.addAllowedHeader("*");
+                            return corsConfiguration;
+                        })
                 )
                 .authorizeHttpRequests(authRequest ->
                         authRequest
+                                .requestMatchers("/usuario/login", "/usuario/crear-usuario").permitAll()
                                 .requestMatchers("/**").permitAll()
                                 .requestMatchers("/v2/api-docs/**",
                                         "/v3/api-docs/**",
@@ -47,6 +55,8 @@ public class SecurityConfig {
                 )
                 .authenticationProvider(authProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
 
     }

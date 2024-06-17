@@ -1,13 +1,19 @@
 package com.eventos.Fiadito.serviceimpl;
 
 import com.eventos.Fiadito.dtos.EstablecimientoDTO;
+import com.eventos.Fiadito.dtos.EstablecimientoRegistroDTO;
+import com.eventos.Fiadito.models.AuthorityName;
 import com.eventos.Fiadito.models.Establecimiento;
 import com.eventos.Fiadito.models.Usuario;
+import com.eventos.Fiadito.repositories.AuthorityRepository;
 import com.eventos.Fiadito.repositories.EstablecimientoRepository;
 import com.eventos.Fiadito.repositories.UsuarioRepository;
 import com.eventos.Fiadito.services.EstablecimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EstablecimientoServiceImpl implements EstablecimientoService {
@@ -18,23 +24,48 @@ public class EstablecimientoServiceImpl implements EstablecimientoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public EstablecimientoDTO registrarEstablecimiento(EstablecimientoDTO establecimientoDTO) {
-        if (!usuarioRepository.existsById(establecimientoDTO.getUsuarioId())) {
-            throw new RuntimeException("Usuario no encontrado");
+    @Autowired
+    private AuthorityRepository authorityRepository;
+
+    public EstablecimientoDTO registrarEstablecimiento(EstablecimientoRegistroDTO establecimientoDTO) {
+
+        // Verificar si el usuario ya existe
+        Usuario usuario = usuarioRepository.findByUsername(establecimientoDTO.getUsuario().getUsername());
+        // Si el usuario no existe crear usuario
+        if (usuario != null) {
+            throw new RuntimeException("Usuario existente");
         }
-        Usuario usuario = usuarioRepository.findById(establecimientoDTO.getUsuarioId()).get();
+        // Crear usuario
+        Usuario nuevoUsuario = new Usuario(
+                establecimientoDTO.getUsuario().getUsername(),
+                new BCryptPasswordEncoder().encode(establecimientoDTO.getUsuario().getPassword()),
+                establecimientoDTO.getUsuario().getEmail(),
+                establecimientoDTO.getUsuario().getNombre(),
+                List.of(authorityRepository.findByName(AuthorityName.ROLE_ESTABLECIMIENTO))
+        );
+        usuarioRepository.save(nuevoUsuario);
 
+        // Crear establecimiento
         Establecimiento establecimiento = new Establecimiento();
-        establecimiento.setNombre(establecimientoDTO.getNombre());
-        establecimiento.setUsuario(usuario);
-        establecimiento.setDireccion(establecimientoDTO.getDireccion());
-        establecimiento.setRubro(establecimientoDTO.getRubro());
-        establecimiento.setProvincia(establecimientoDTO.getProvincia());
-        establecimiento.setCiudad(establecimientoDTO.getCiudad());
-
+        establecimiento.setNombre(establecimientoDTO.getEstablecimiento().getNombre());
+        establecimiento.setDireccion(establecimientoDTO.getEstablecimiento().getDireccion());
+        establecimiento.setRubro(establecimientoDTO.getEstablecimiento().getRubro());
+        establecimiento.setProvincia(establecimientoDTO.getEstablecimiento().getProvincia());
+        establecimiento.setCiudad(establecimientoDTO.getEstablecimiento().getCiudad());
+        establecimiento.setUsuario(nuevoUsuario);
         Establecimiento nuevoEstablecimiento = establecimientoRepository.save(establecimiento);
-        establecimientoDTO.setId(nuevoEstablecimiento.getId());
-        return establecimientoDTO;
+
+        // Crear establecimientoDTO
+        EstablecimientoDTO nuevoEstablecimientoDTO = new EstablecimientoDTO();
+        nuevoEstablecimientoDTO.setId(nuevoEstablecimiento.getId());
+        nuevoEstablecimientoDTO.setNombre(nuevoEstablecimiento.getNombre());
+        nuevoEstablecimientoDTO.setDireccion(nuevoEstablecimiento.getDireccion());
+        nuevoEstablecimientoDTO.setRubro(nuevoEstablecimiento.getRubro());
+        nuevoEstablecimientoDTO.setProvincia(nuevoEstablecimiento.getProvincia());
+        nuevoEstablecimientoDTO.setCiudad(nuevoEstablecimiento.getCiudad());
+        nuevoEstablecimientoDTO.setUsuarioId(nuevoEstablecimiento.getUsuario().getId());
+        return nuevoEstablecimientoDTO;
+
     }
 
     //TODO: Actualizar datos establecimiento

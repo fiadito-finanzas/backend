@@ -1,6 +1,7 @@
 package com.eventos.Fiadito.controllers;
 
 import com.eventos.Fiadito.dtos.EstablecimientoDTO;
+import com.eventos.Fiadito.dtos.EstablecimientoRegistroDTO;
 import com.eventos.Fiadito.repositories.ClienteRepository;
 import com.eventos.Fiadito.services.EstablecimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class EstablecimientoController {
 
 
     @PostMapping("/registrar-establecimiento")
-    public EstablecimientoDTO registrarEstablecimiento(@RequestBody EstablecimientoDTO establecimientoDTO) {
+    public EstablecimientoDTO registrarEstablecimiento(@RequestBody EstablecimientoRegistroDTO establecimientoDTO) {
         return establecimientoService.registrarEstablecimiento(establecimientoDTO);
     }
 

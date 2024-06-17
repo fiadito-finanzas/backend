@@ -33,6 +33,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userAuthDTO.getUsername(), userAuthDTO.getPassword()));
         SecurityUser securityUser = (SecurityUser) userDetailsService.loadUserByUsername(userAuthDTO.getUsername());
         loginSuccess(userAuthDTO);
+        if (securityUser == null) {
+            throw new RuntimeException("User not found");
+        }
         String jwt = jwtService.generateToken(securityUser);
         return new AuthResponseDTO(jwt);
     }
