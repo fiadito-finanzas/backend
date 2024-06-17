@@ -1,16 +1,12 @@
 package com.eventos.Fiadito.serviceimpl;
 
 import com.eventos.Fiadito.dtos.ClienteDTO;
-import com.eventos.Fiadito.models.Cliente;
-import com.eventos.Fiadito.models.CuentaCorriente;
-import com.eventos.Fiadito.models.Establecimiento;
-import com.eventos.Fiadito.models.Usuario;
-import com.eventos.Fiadito.repositories.ClienteRepository;
-import com.eventos.Fiadito.repositories.CuentaCorrienteRepository;
-import com.eventos.Fiadito.repositories.EstablecimientoRepository;
-import com.eventos.Fiadito.repositories.UsuarioRepository;
+import com.eventos.Fiadito.dtos.ClienteRegistroDTO;
+import com.eventos.Fiadito.models.*;
+import com.eventos.Fiadito.repositories.*;
 import com.eventos.Fiadito.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -32,44 +28,49 @@ public class ClienteServiceImpl implements ClienteService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public ClienteDTO crearCliente(ClienteDTO clienteDTO) {
-        Establecimiento establecimiento = establecimientoRepository.findById(clienteDTO.getEstablecimientoId()).orElseThrow();
-        // Validar que no exista el cliente
-        Cliente clienteExistente = clienteRepository.findByDni(clienteDTO.getDni());
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
-        // Que el usuario no esté siendo usado
-        if (clienteExistente != null) {
-            throw new RuntimeException("Cliente ya existe");
+    public ClienteDTO crearCliente(ClienteRegistroDTO clienteRegistroDTO) {
+        // Buscar establecimiento
+        Establecimiento establecimiento = establecimientoRepository.findById(clienteRegistroDTO.getCliente().getEstablecimientoId()).orElseThrow();
+        // Verificar si existe usuario
+        Optional<Usuario> usuario = Optional.ofNullable(usuarioRepository.findByUsername(clienteRegistroDTO.getUsuario().getUsername()));
+        if (usuario.isPresent()) {
+            throw new RuntimeException("El usuario ya existe");
         }
-
-        // Buscar usuario
-        Optional<Usuario> usuario = usuarioRepository.findById(clienteDTO.getUsuarioId());
-
-        if (usuario.isEmpty()) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
-
-        if (establecimiento == null) {
-            throw new RuntimeException("Establecimiento no encontrado");
-        }
+        // Crear usuario
+        Usuario nuevoUsuario = new Usuario(
+                clienteRegistroDTO.getUsuario().getUsername(),
+                new BCryptPasswordEncoder().encode(clienteRegistroDTO.getUsuario().getPassword()),
+                clienteRegistroDTO.getUsuario().getEmail(),
+                clienteRegistroDTO.getUsuario().getNombre(),
+                List.of(authorityRepository.findByName(AuthorityName.ROLE_CLIENTE))
+        );
+        usuarioRepository.save(nuevoUsuario);
+        // Crear cliente
         Cliente cliente = new Cliente();
-        cliente.setNombre(clienteDTO.getNombre());
-        cliente.setDni(clienteDTO.getDni());
-        cliente.setDireccion(clienteDTO.getDireccion());
-        cliente.setEmail(clienteDTO.getEmail());
-        cliente.setTelefono(clienteDTO.getTelefono());
+        cliente.setNombre(clienteRegistroDTO.getCliente().getNombre());
+        cliente.setDni(clienteRegistroDTO.getCliente().getDni());
+        cliente.setDireccion(clienteRegistroDTO.getCliente().getDireccion());
+        cliente.setEmail(clienteRegistroDTO.getCliente().getEmail());
+        cliente.setTelefono(clienteRegistroDTO.getCliente().getTelefono());
         cliente.setFechaRegistro(new Date());
         cliente.setEstablecimiento(establecimiento);
-        cliente.setEnMora(clienteDTO.isEnMora());
-        cliente.setUsuario(usuario.get());
-        cliente.setCuentaCorriente(null);
-        if (clienteExistente != null) {
-            throw new RuntimeException("Cliente ya existe");
-        }
-
-        Cliente nuevoCliente = clienteRepository.save(cliente);
-        clienteDTO.setUsuarioId(nuevoCliente.getId());
-        return clienteDTO;
+        cliente.setUsuario(nuevoUsuario);
+        clienteRepository.save(cliente);
+        // Crear DTO
+        return new ClienteDTO() {{
+            setUsuarioId(cliente.getId());
+            setNombre(cliente.getNombre());
+            setDni(cliente.getDni());
+            setDireccion(cliente.getDireccion());
+            setEmail(cliente.getEmail());
+            setTelefono(cliente.getTelefono());
+            setFechaRegistro(cliente.getFechaRegistro());
+            setEstablecimientoId(cliente.getEstablecimiento().getId());
+            setEnMora(cliente.isEnMora());
+        }};
     }
 
     @Override

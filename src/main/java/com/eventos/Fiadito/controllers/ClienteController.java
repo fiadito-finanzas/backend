@@ -1,6 +1,7 @@
 package com.eventos.Fiadito.controllers;
 
 import com.eventos.Fiadito.dtos.ClienteDTO;
+import com.eventos.Fiadito.dtos.ClienteRegistroDTO;
 import com.eventos.Fiadito.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @PostMapping("/crear-cliente")
-    public ClienteDTO crearCliente(@RequestBody ClienteDTO clienteDTO) {
-        ClienteDTO nuevoCliente = clienteService.crearCliente(clienteDTO);
+    public ClienteDTO crearCliente(@RequestBody ClienteRegistroDTO clienteRegistroDTO) {
+        ClienteDTO nuevoCliente = clienteService.crearCliente(clienteRegistroDTO);
         return nuevoCliente;
     }
 

@@ -1,13 +1,14 @@
 package com.eventos.Fiadito.services;
 
 import com.eventos.Fiadito.dtos.ClienteDTO;
+import com.eventos.Fiadito.dtos.ClienteRegistroDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public interface ClienteService {
-    ClienteDTO crearCliente(ClienteDTO clienteDTO);
+    ClienteDTO crearCliente(ClienteRegistroDTO clienteRegistroDTO);
     //Cliente findById(Long id);
     //List<Cliente> listarClientes();
 
