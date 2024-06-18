@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class DeudaMensualDTO {
@@ -17,4 +18,6 @@ public class DeudaMensualDTO {
     private double monto;
     private double interes;
     private boolean pagada;
+    private List<TransaccionDTO> transacciones; // Relación con TransaccionDTO
+
 }

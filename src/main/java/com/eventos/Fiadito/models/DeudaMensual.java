@@ -18,10 +18,6 @@ public class DeudaMensual {
     @JoinColumn(name = "cuenta_corriente_id", nullable = false)
     private CuentaCorriente cuentaCorriente;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaccion_id", nullable = false)
-    private Transaccion transaccion;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date fechaTransaccion;

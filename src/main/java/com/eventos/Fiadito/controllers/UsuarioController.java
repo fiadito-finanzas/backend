@@ -56,7 +56,11 @@ public class UsuarioController {
         }
     }
 
-    //Logout
+    //Obtener usuario
+    @GetMapping("/obtener-usuario/{usuarioId}")
+    public ResponseEntity<?> obtenerUsuario(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(usuarioService.obtenerUsuario(usuarioId));
+    }
 
 
 

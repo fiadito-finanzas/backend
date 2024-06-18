@@ -13,6 +13,8 @@ public interface EstablecimientoService {
     EstablecimientoDTO registrarEstablecimiento(EstablecimientoRegistroDTO establecimiento);
     //Establecimiento obtenerEstablecimientoPorId(Long establecimientoId);
 
+    EstablecimientoDTO obtenerEstablecimientoPorUsuario(Long usuarioId);
+
     //TODO: Actualizar datos establecimiento
     EstablecimientoDTO actualizarEstablecimiento(EstablecimientoDTO establecimiento);
 

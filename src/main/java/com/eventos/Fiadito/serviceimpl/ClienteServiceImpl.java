@@ -39,6 +39,17 @@ public class ClienteServiceImpl implements ClienteService {
         if (usuario.isPresent()) {
             throw new RuntimeException("El usuario ya existe");
         }
+
+        // Verifica si existe cliente
+        Cliente clienteExistente = clienteRepository.findByDni(clienteRegistroDTO.getCliente().getDni());
+        if (clienteExistente != null) {
+            throw new RuntimeException("El cliente ya existe");
+        }
+        // Verificar si correo existe cliente
+        Cliente clienteExistenteEmail = clienteRepository.findByEmail(clienteRegistroDTO.getCliente().getEmail());
+        if (clienteExistenteEmail != null) {
+            throw new RuntimeException("El correo ya existe");
+        }
         // Crear usuario
         Usuario nuevoUsuario = new Usuario(
                 clienteRegistroDTO.getUsuario().getUsername(),
@@ -61,7 +72,8 @@ public class ClienteServiceImpl implements ClienteService {
         clienteRepository.save(cliente);
         // Crear DTO
         return new ClienteDTO() {{
-            setUsuarioId(cliente.getId());
+            setId(cliente.getId());
+            setUsuarioId(nuevoUsuario.getId());
             setNombre(cliente.getNombre());
             setDni(cliente.getDni());
             setDireccion(cliente.getDireccion());
@@ -77,7 +89,8 @@ public class ClienteServiceImpl implements ClienteService {
     public List<ClienteDTO> obtenerClientesPorEstablecimiento(Long establecimientoId) {
         List<Cliente> clientes = clienteRepository.findByEstablecimientoId(establecimientoId);
         return clientes.stream().map(cliente -> new ClienteDTO() {{
-            setUsuarioId(cliente.getId());
+            setUsuarioId(getUsuarioId());
+            setId(cliente.getId());
             setNombre(cliente.getNombre());
             setDni(cliente.getDni());
             setDireccion(cliente.getDireccion());
@@ -85,7 +98,12 @@ public class ClienteServiceImpl implements ClienteService {
             setTelefono(cliente.getTelefono());
             setFechaRegistro(cliente.getFechaRegistro());
             setEstablecimientoId(cliente.getEstablecimiento().getId());
-            setCuentaCorrienteId(cliente.getCuentaCorriente().getId());
+            if (cliente.getCuentaCorriente() != null) {
+                setCuentaCorrienteId(cliente.getCuentaCorriente().getId());
+            }
+            else {
+                setCuentaCorrienteId(null);
+            }
             setEnMora(cliente.isEnMora());
         }}).collect(Collectors.toList());
     }
@@ -118,7 +136,8 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteDTO obtenerCliente(Long clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId).orElseThrow();
         return new ClienteDTO() {{
-            setUsuarioId(cliente.getId());
+            setUsuarioId(cliente.getUsuario().getId());
+            setId(cliente.getId());
             setNombre(cliente.getNombre());
             setDni(cliente.getDni());
             setDireccion(cliente.getDireccion());
@@ -126,7 +145,46 @@ public class ClienteServiceImpl implements ClienteService {
             setTelefono(cliente.getTelefono());
             setFechaRegistro(cliente.getFechaRegistro());
             setEstablecimientoId(cliente.getEstablecimiento().getId());
-            setCuentaCorrienteId(cliente.getCuentaCorriente().getId());
+            if (cliente.getCuentaCorriente() != null) {
+                setCuentaCorrienteId(cliente.getCuentaCorriente().getId());
+            }
+            else {
+                setCuentaCorrienteId(null);
+            }
+            setEnMora(cliente.isEnMora());
+        }};
+    }
+
+    // Obtener cliente por usuario
+    public ClienteDTO obtenerClientePorUsuario(Long usuarioId) {
+        Optional<Usuario> usuarioOptional = usuarioRepository.findById(usuarioId);
+        if (usuarioOptional.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado con ID: " + usuarioId);
+        }
+
+        Cliente cliente = clienteRepository.findByUsuarioId(usuarioId);
+        if (cliente == null) {
+            throw new RuntimeException("Cliente no encontrado para el usuario con ID: " + usuarioId);
+            // O bien, puedes devolver un valor predeterminado o un DTO vacío según tu lógica de negocio
+            // return new ClienteDTO(); // Por ejemplo, devolver un DTO vacío
+        }
+
+        return new ClienteDTO() {{
+            setUsuarioId(usuarioId);
+            setId(cliente.getId());
+            setNombre(cliente.getNombre());
+            setDni(cliente.getDni());
+            setDireccion(cliente.getDireccion());
+            setEmail(cliente.getEmail());
+            setTelefono(cliente.getTelefono());
+            setFechaRegistro(cliente.getFechaRegistro());
+            setEstablecimientoId(cliente.getEstablecimiento().getId());
+            if (cliente.getCuentaCorriente() != null) {
+                setCuentaCorrienteId(cliente.getCuentaCorriente().getId());
+            }
+            else {
+                setCuentaCorrienteId(null);
+            }
             setEnMora(cliente.isEnMora());
         }};
     }

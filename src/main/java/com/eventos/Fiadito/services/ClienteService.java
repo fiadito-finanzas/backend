@@ -2,6 +2,7 @@ package com.eventos.Fiadito.services;
 
 import com.eventos.Fiadito.dtos.ClienteDTO;
 import com.eventos.Fiadito.dtos.ClienteRegistroDTO;
+import com.mysql.cj.xdevapi.Client;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public interface ClienteService {
     ClienteDTO crearCliente(ClienteRegistroDTO clienteRegistroDTO);
     //Cliente findById(Long id);
     //List<Cliente> listarClientes();
+    ClienteDTO obtenerClientePorUsuario(Long usuarioId);
 
     //TODO: Obtener clientes por establecimiento
     List<ClienteDTO> obtenerClientesPorEstablecimiento(Long establecimientoId);

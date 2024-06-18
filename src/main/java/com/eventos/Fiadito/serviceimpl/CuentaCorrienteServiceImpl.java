@@ -10,6 +10,7 @@ import com.eventos.Fiadito.services.CuentaCorrienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 
@@ -60,6 +61,8 @@ public class CuentaCorrienteServiceImpl implements CuentaCorrienteService {
         cuentaCorriente.setM(m);
         cuentaCorriente.setN(n);
         cuentaCorriente.setTEP(TEP);
+        cuentaCorriente.setTransacciones(new ArrayList<>());
+        cuentaCorriente.setDeudasMensuales(new ArrayList<>());
         cuentaCorrienteRepository.save(cuentaCorriente);
         // Crear DTO
         CuentaCorrienteDTO cuentaCreada = new CuentaCorrienteDTO();
@@ -97,7 +100,28 @@ public class CuentaCorrienteServiceImpl implements CuentaCorrienteService {
         }
     }
 
-    public double calcularTEP(double tn,double M,double N) {
+    @Override
+    public CuentaCorrienteDTO obtenerCuentaCorriente(Long clienteId) {
+        // Buscar cuenta corriente
+        Optional<CuentaCorriente> optionalCuentaCorriente = Optional.ofNullable(cuentaCorrienteRepository.findByClienteId(clienteId));
+        if (optionalCuentaCorriente.isEmpty()) {
+            throw new IllegalArgumentException("Cuenta corriente no encontrada");
+        }
+        // Crear DTO
+        CuentaCorriente cuentaCorriente = optionalCuentaCorriente.get();
+        CuentaCorrienteDTO cuentaCorrienteDTO = new CuentaCorrienteDTO();
+        cuentaCorrienteDTO.setId(cuentaCorriente.getId());
+        cuentaCorrienteDTO.setClienteId(cuentaCorriente.getCliente().getId());
+        cuentaCorrienteDTO.setTasaInteres(cuentaCorriente.getTasaInteres());
+        cuentaCorrienteDTO.setTasaMoratoria(cuentaCorriente.getTasaMoratoria());
+        cuentaCorrienteDTO.setSaldoCredito(cuentaCorriente.getSaldoCredito());
+        cuentaCorrienteDTO.setFechaPagoMensual(cuentaCorriente.getFechaPagoMensual());
+        cuentaCorrienteDTO.setTipoInteres(cuentaCorriente.getTipoInteres());
+        cuentaCorrienteDTO.setPeriodoCapitalizacion(cuentaCorriente.getPeriodoCapitalizacion());
+        return cuentaCorrienteDTO;
+    }
+
+    public double calcularTEP(double tn, double M, double N) {
         // TEP = ( 1 + TN / m ) ^ n - 1
         double TN = tn*0.01;
         double m = M;

@@ -18,4 +18,9 @@ public class CuentaCorrienteController {
         return ResponseEntity.ok(cuentaCorrienteService.crearCuentaCorriente(cuentaCorrienteDTO));
     }
 
+    @GetMapping("/obtener-cuenta-corriente/{clienteId}")
+    public ResponseEntity<?> obtenerCuentaCorriente(@PathVariable Long clienteId) {
+        return ResponseEntity.ok(cuentaCorrienteService.obtenerCuentaCorriente(clienteId));
+    }
+
 }

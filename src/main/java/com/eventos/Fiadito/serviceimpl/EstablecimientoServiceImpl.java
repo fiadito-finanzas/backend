@@ -108,5 +108,20 @@ public class EstablecimientoServiceImpl implements EstablecimientoService {
         return establecimientoDTO;
     }
 
+    //TODO: Obtener Establecimiento por usuario ID
+    public EstablecimientoDTO obtenerEstablecimientoPorUsuario(Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId).get();
+        Establecimiento establecimiento = establecimientoRepository.findByUsuarioId(usuario.getId());
+        EstablecimientoDTO establecimientoDTO = new EstablecimientoDTO();
+        establecimientoDTO.setId(establecimiento.getId());
+        establecimientoDTO.setNombre(establecimiento.getNombre());
+        establecimientoDTO.setDireccion(establecimiento.getDireccion());
+        establecimientoDTO.setRubro(establecimiento.getRubro());
+        establecimientoDTO.setProvincia(establecimiento.getProvincia());
+        establecimientoDTO.setCiudad(establecimiento.getCiudad());
+        establecimientoDTO.setUsuarioId(establecimiento.getUsuario().getId());
+        return establecimientoDTO;
+    }
+
 
 }

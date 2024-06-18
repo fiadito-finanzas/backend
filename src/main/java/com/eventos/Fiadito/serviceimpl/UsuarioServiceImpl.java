@@ -18,4 +18,17 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO) {
         return null;
     }
+
+    public UsuarioDTO obtenerUsuario(Long usuarioId) {
+        // Verificar si existe usuario
+        Usuario usuario = usuarioRepository.findById(usuarioId).
+                orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        // Construir DTO
+        UsuarioDTO usuarioDTO = new UsuarioDTO();
+        usuarioDTO.setId(usuario.getId());
+        usuarioDTO.setUsername(usuario.getUsername());
+        usuarioDTO.setEmail(usuario.getEmail());
+        usuarioDTO.setNombre(usuario.getNombre());
+        return usuarioDTO;
+    }
 }

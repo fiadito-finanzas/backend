@@ -9,10 +9,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +42,7 @@ public class TransaccionServiceImpl implements TransaccionService {
             throw new IllegalArgumentException("Saldo insuficiente en la cuenta corriente");
         }
 
+
         // Verificar si la transacción es COMPRA
         if (transaccionDTO.getTipo().equals("COMPRA")) {
             Double intereses = calcularInteres(transaccionDTO.getMonto(), cuentaCorriente.getTEP());
@@ -62,6 +60,8 @@ public class TransaccionServiceImpl implements TransaccionService {
             // Actualizar saldo de la cuenta corriente
             cuentaCorriente.setSaldoCredito(cuentaCorriente.getSaldoCredito() - montoTotal);
             cuentaCorrienteRepository.save(cuentaCorriente);
+            // Añadir transaccion a cuentacorriente
+            cuentaCorriente.getTransacciones().add(transaccion);
 
             // Verificar si hay una deuda mensual para el mes actual
             Date fechaMensual = cuentaCorriente.getFechaPagoMensual();
@@ -91,7 +91,6 @@ public class TransaccionServiceImpl implements TransaccionService {
                 deudaMensual.setPagada(false);
                 // El mes actual
                 deudaMensual.setFechaTransaccion(new Date());
-                deudaMensual.setTransaccion(transaccion);
                 // Guardar la deuda mensual
                 deudaMensualRepository.save(deudaMensual);
             } else {
@@ -100,8 +99,6 @@ public class TransaccionServiceImpl implements TransaccionService {
                 deudaMensual.setMonto(deudaMensual.getMonto() + montoTotal);
                 deudaMensual.setInteres(deudaMensual.getInteres() + intereses);
                 deudaMensual.setFechaTransaccion(new Date());
-                // Actualizar la lista de transacciones de la deuda
-                deudaMensual.setTransaccion(transaccion);
                 deudaMensualRepository.save(deudaMensual);
             }
 
@@ -181,6 +178,8 @@ public class TransaccionServiceImpl implements TransaccionService {
             transaccion.setTotalMonto(0.00);
             transaccion.setTipo(transaccionDTO.getTipo());
             transaccionRepository.save(transaccion);
+            // Añadir transaccion a cuentacorriente
+            cuentaCorriente.getTransacciones().add(transaccion);
 
             Calendar fechaVencimiento = Calendar.getInstance();
             fechaVencimiento.setTime(cuentaCorriente.getFechaPagoMensual());
@@ -254,7 +253,6 @@ public class TransaccionServiceImpl implements TransaccionService {
                     // Crear si no existe
                     DeudaMensual deudaMensualNueva = new DeudaMensual();
                     deudaMensualNueva.setCuentaCorriente(cuentaCorriente);
-                    deudaMensualNueva.setTransaccion(transaccion);
                     deudaMensualNueva.setFechaTransaccion(new Date());
                     deudaMensualNueva.setFechaInicioCiclo(fechaInicioCiclo.getTime());
                     deudaMensualNueva.setFechaFinCiclo(fechaVencimiento.getTime());
@@ -262,12 +260,12 @@ public class TransaccionServiceImpl implements TransaccionService {
                     deudaMensualNueva.setInteres(interes);
                     deudaMensualNueva.setPagada(false);
                     deudaMensualRepository.save(deudaMensualNueva);
+
                 } else {
                     // Actualizar si existe
                     deudaMensual.setMonto(deudaMensual.getMonto() + montocuota);
                     deudaMensual.setInteres(deudaMensual.getInteres() + interes);
                     deudaMensual.setFechaTransaccion(new Date());
-                    deudaMensual.setTransaccion(transaccion);
                     deudaMensualRepository.save(deudaMensual);
                 }
 

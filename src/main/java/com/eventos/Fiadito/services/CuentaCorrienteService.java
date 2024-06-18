@@ -10,5 +10,6 @@ import java.util.List;
 @Service
 public interface CuentaCorrienteService {
     CuentaCorrienteDTO crearCuentaCorriente(CuentaCorrienteDTO cuentaCorrienteDTO);
+    CuentaCorrienteDTO obtenerCuentaCorriente(Long clienteId);
     //List<Transaccion> obtenerTransacciones(Long cuentaCorrienteId);
 }

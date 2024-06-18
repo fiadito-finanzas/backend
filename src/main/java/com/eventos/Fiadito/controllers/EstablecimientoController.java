@@ -27,6 +27,12 @@ public class EstablecimientoController {
         return establecimientoService.obtenerEstablecimiento(establecimientoId);
     }
 
+    // Obtener establecimiento por userId
+    @GetMapping("/obtener-establecimiento-por-usuario/{usuarioId}")
+    public EstablecimientoDTO obtenerEstablecimientoPorUsuario(@PathVariable Long usuarioId) {
+        return establecimientoService.obtenerEstablecimientoPorUsuario(usuarioId);
+    }
+
     // Actualizar establecimiento
     @PutMapping("/actualizar-establecimiento")
     public EstablecimientoDTO actualizarEstablecimiento(@RequestBody EstablecimientoDTO establecimientoDTO) {

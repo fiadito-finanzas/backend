@@ -7,4 +7,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UsuarioService {
     UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO);
+    UsuarioDTO obtenerUsuario(Long usuarioId);
 }
