@@ -10,7 +10,7 @@ import java.util.List;
 public interface TransaccionService {
     TransaccionDTO registrarTransaccion(TransaccionDTO transaccionDTO);
 
-    List<Transaccion> obtenerTransaccionesPorCuentaCorriente(Long cuentaCorriente);
+    List<TransaccionDTO> obtenerTransaccionesPorCuentaCorriente(Long cuentaCorriente);
 
     //TODO: Obtener transaccion por ID
     Transaccion obtenerTransaccionPorId(Long transaccionId);

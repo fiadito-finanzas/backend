@@ -301,7 +301,7 @@ public class TransaccionServiceImpl implements TransaccionService {
     }
 
     // TODO: Obtener transacciones por cuenta corriente
-    public List<Transaccion> obtenerTransaccionesPorCuentaCorriente(Long cuentaCorriente) {
+    public List<TransaccionDTO> obtenerTransaccionesPorCuentaCorriente(Long cuentaCorriente) {
         // Encontrar la cuenta corriente
         Optional<CuentaCorriente> optionalCuentaCorriente = cuentaCorrienteRepository.findById(cuentaCorriente);
         if (optionalCuentaCorriente.isEmpty()) {
@@ -311,7 +311,23 @@ public class TransaccionServiceImpl implements TransaccionService {
         // Encontrar las transacciones por cuenta corriente
         List<Transaccion> transacciones = transaccionRepository.findByCuentaCorriente(cuentaCorrienteObj);
 
-        return transacciones;
+        // Convertir a DTO
+        List<TransaccionDTO> transaccionesDTO = transacciones.stream().map(transaccion -> {
+            // Contar las cuotas que tiene la transacción si es de tipo CUOTA_A_CUOTAS
+            int cuotas = 0;
+            if (transaccion.getTipo().equals("COMPRA_A_CUOTAS")) {
+                cuotas = cuotaRepository.findByTransaccionId(transaccion.getId()).size();
+            }
+            TransaccionDTO transaccionDTO = new TransaccionDTO();
+            transaccionDTO.setCuentaCorrienteId(transaccion.getCuentaCorriente().getId());
+            transaccionDTO.setFecha(transaccion.getFecha());
+            transaccionDTO.setMonto(transaccion.getMonto());
+            transaccionDTO.setTipo(transaccion.getTipo());
+            transaccionDTO.setInteres(transaccion.getInteres());
+            transaccionDTO.setCuotas(cuotas);
+            return transaccionDTO;
+        }).collect(Collectors.toList());
+        return transaccionesDTO;
     }
 
     //TODO: Obtener transacciones por establecimiento

@@ -15,9 +15,8 @@ public class DeudaMensualDTO {
     private Date mes;
     private Date fechaInicioCiclo; // Fecha de inicio del ciclo de pago
     private Date fechaFinCiclo; // Fecha de fin del ciclo de pago
+    private Date fechaPago;
     private double monto;
     private double interes;
     private boolean pagada;
-    private List<TransaccionDTO> transacciones; // Relación con TransaccionDTO
-
 }

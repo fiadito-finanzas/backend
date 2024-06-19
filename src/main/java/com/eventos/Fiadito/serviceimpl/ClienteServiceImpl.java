@@ -113,14 +113,23 @@ public class ClienteServiceImpl implements ClienteService {
         // Buscar cuentaCorriente
         CuentaCorriente cuentaCorriente = cuentaCorrienteRepository.findById(clienteDTO.getCuentaCorrienteId()).orElseThrow();
 
-        Cliente cliente = clienteRepository.findById(clienteDTO.getUsuarioId()).orElseThrow();
+        // Verificar si email aún está disponible
+        Cliente clienteExistenteEmail = clienteRepository.findByEmail(clienteDTO.getEmail());
+        if (clienteExistenteEmail != null && !clienteExistenteEmail.getId().equals(clienteDTO.getId())) {
+            throw new RuntimeException("El correo ya existe");
+        }
+
+        Cliente cliente = clienteRepository.findById(clienteDTO.getId()).orElseThrow();
         cliente.setNombre(clienteDTO.getNombre());
         cliente.setDni(clienteDTO.getDni());
         cliente.setDireccion(clienteDTO.getDireccion());
         cliente.setEmail(clienteDTO.getEmail());
         cliente.setTelefono(clienteDTO.getTelefono());
-        cliente.setEnMora(clienteDTO.isEnMora());
+        cliente.setEnMora(cliente.isEnMora());
         cliente.setCuentaCorriente(cuentaCorriente);
+        cliente.setFechaRegistro(cliente.getFechaRegistro());
+        cliente.setEstablecimiento(cliente.getEstablecimiento());
+        cliente.setUsuario(cliente.getUsuario());
         clienteRepository.save(cliente);
         return clienteDTO;
     }
