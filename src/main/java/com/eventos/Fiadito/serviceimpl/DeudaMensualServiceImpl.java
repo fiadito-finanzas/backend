@@ -65,6 +65,7 @@ public class DeudaMensualServiceImpl implements DeudaMensualService {
             deudaMensualDTO.setFechaPago(deudaMensual.get().getFechaFinCiclo());
             deudaMensualDTO.setMonto(deudaMensual.get().getMonto());
             deudaMensualDTO.setInteres(deudaMensual.get().getInteres());
+            deudaMensualDTO.setId(deudaMensual.get().getId());
             return Optional.of(deudaMensualDTO);
         } else {
             return Optional.empty();

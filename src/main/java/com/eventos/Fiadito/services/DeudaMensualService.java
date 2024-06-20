@@ -14,4 +14,5 @@ public interface DeudaMensualService {
     public DeudaMensual obtenerDeudaMensualPorCuentaCorrienteEntreFechas(Long cuentaCorrienteId, Date fechaInicio, Date fechaFin);
     public List<DeudaMensualDTO> obtenerDeudasMensualesPorCuentaCorriente(Long cuentaCorrienteId);
     public Optional<DeudaMensualDTO> obtenerDeudaMensualActual(Long cuentaCorrienteId);
+
 }

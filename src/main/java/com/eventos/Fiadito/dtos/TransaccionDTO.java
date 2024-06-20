@@ -11,7 +11,7 @@ public class TransaccionDTO {
     private Long cuentaCorrienteId;
     private Date fecha;
     private double monto;
-    private String tipo; // Puede ser COMPRA, PAGO o COMPRA_A_CUOTAS
+    private String tipo; // Puede ser COMPRA o COMPRA_A_CUOTAS
     private double interes;
     private int cuotas;
     private int cantidadPlazoGraciaT;

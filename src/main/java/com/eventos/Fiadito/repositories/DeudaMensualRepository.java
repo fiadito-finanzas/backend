@@ -21,4 +21,7 @@ public interface DeudaMensualRepository extends JpaRepository<DeudaMensual, Long
             "YEAR(d.fechaFinCiclo) = YEAR(:currentDate)")
     Optional<DeudaMensual> findDeudaMensualActual(@Param("cuentaCorrienteId") Long cuentaCorrienteId,
                                                   @Param("currentDate") Date currentDate);
+
+    @Query("SELECT d FROM DeudaMensual d WHERE d.pagado = false")
+    List<DeudaMensual> findByPagadoFalse();
 }

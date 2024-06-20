@@ -16,4 +16,7 @@ public interface TransaccionRepository extends JpaRepository<Transaccion, Long> 
 
     @Query("SELECT t FROM Transaccion t WHERE t.fecha BETWEEN :fechaInicio AND :fechaFin")
     List<Transaccion> findByFechaBetween(Date fechaInicio, Date fechaFin);
+
+    @Query("SELECT t FROM Transaccion t WHERE t.fecha BETWEEN :fechaInicio AND :fechaFin AND t.cuentaCorriente.id = :cuentaCorrienteId")
+    List<Transaccion> findByCuentaCorrienteAndFechaBetween(Date fechaInicio, Date fechaFin, Long cuentaCorrienteId);
 }

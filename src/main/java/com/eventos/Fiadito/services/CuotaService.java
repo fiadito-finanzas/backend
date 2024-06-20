@@ -1,5 +1,6 @@
 package com.eventos.Fiadito.services;
 
+import com.eventos.Fiadito.dtos.CuotaDTO;
 import com.eventos.Fiadito.models.Cuota;
 import org.springframework.stereotype.Service;
 
@@ -16,5 +17,9 @@ public interface CuotaService {
 
     //TODO: Obtener cuota
     Cuota obtenerCuota(Long cuotaId);
+
+    //TODO: Obtener cuotas por deuda mensual
+    List<CuotaDTO> obtenerCuotasPorDeudaMensual(Long deudaMensualId);
+
 
 }

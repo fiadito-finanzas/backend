@@ -10,6 +10,7 @@ import java.util.List;
 
 @Data
 public class DeudaMensualDTO {
+    private Long id;
     private Long transaccionId;
     private Long cuentaCorrienteId;
     private Date mes;

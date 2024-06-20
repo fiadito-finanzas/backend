@@ -96,6 +96,7 @@ public class TransaccionServiceImpl implements TransaccionService {
             } else {
                 // Si existe una deuda mensual, se actualiza el monto
                 DeudaMensual deudaMensual = deudaMensualExiste;
+                deudaMensual.setPagada(false);
                 deudaMensual.setMonto(deudaMensual.getMonto() + montoTotal);
                 deudaMensual.setInteres(deudaMensual.getInteres() + intereses);
                 deudaMensual.setFechaTransaccion(new Date());
@@ -180,7 +181,8 @@ public class TransaccionServiceImpl implements TransaccionService {
             transaccionRepository.save(transaccion);
             // Añadir transaccion a cuentacorriente
             cuentaCorriente.getTransacciones().add(transaccion);
-
+            // Actualizar saldo de la cuenta corriente
+            cuentaCorriente.setSaldoCredito(cuentaCorriente.getSaldoCredito() - transaccionDTO.getMonto());
             Calendar fechaVencimiento = Calendar.getInstance();
             fechaVencimiento.setTime(cuentaCorriente.getFechaPagoMensual());
             Calendar fechaInicioCiclo = Calendar.getInstance();
@@ -263,6 +265,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
                 } else {
                     // Actualizar si existe
+                    deudaMensual.setPagada(false);
                     deudaMensual.setMonto(deudaMensual.getMonto() + montocuota);
                     deudaMensual.setInteres(deudaMensual.getInteres() + interes);
                     deudaMensual.setFechaTransaccion(new Date());
@@ -315,8 +318,20 @@ public class TransaccionServiceImpl implements TransaccionService {
         List<TransaccionDTO> transaccionesDTO = transacciones.stream().map(transaccion -> {
             // Contar las cuotas que tiene la transacción si es de tipo CUOTA_A_CUOTAS
             int cuotas = 0;
+            int cantidadPlazoGraciaT = 0;
+            int cantidadPlazoGraciaP = 0;
             if (transaccion.getTipo().equals("COMPRA_A_CUOTAS")) {
                 cuotas = cuotaRepository.findByTransaccionId(transaccion.getId()).size();
+                // Contar cuotas con plazo gracia T
+                // Buscar cuotas
+                List<Cuota> cuotasList = cuotaRepository.findByTransaccionId(transaccion.getId());
+                for (Cuota cuota : cuotasList) {
+                    if (cuota.getPeriodoGracia().equals("T")) {
+                        cantidadPlazoGraciaT++;
+                    } else if (cuota.getPeriodoGracia().equals("P")) {
+                        cantidadPlazoGraciaP++;
+                    }
+                }
             }
             TransaccionDTO transaccionDTO = new TransaccionDTO();
             transaccionDTO.setCuentaCorrienteId(transaccion.getCuentaCorriente().getId());
@@ -325,6 +340,8 @@ public class TransaccionServiceImpl implements TransaccionService {
             transaccionDTO.setTipo(transaccion.getTipo());
             transaccionDTO.setInteres(transaccion.getInteres());
             transaccionDTO.setCuotas(cuotas);
+            transaccionDTO.setCantidadPlazoGraciaT(cantidadPlazoGraciaT);
+            transaccionDTO.setCantidadPlazoGraciaP(cantidadPlazoGraciaP);
             return transaccionDTO;
         }).collect(Collectors.toList());
         return transaccionesDTO;

@@ -23,4 +23,14 @@ public class CuentaCorrienteController {
         return ResponseEntity.ok(cuentaCorrienteService.obtenerCuentaCorriente(clienteId));
     }
 
+    @PutMapping("/actualizar-cuenta-corriente")
+    public ResponseEntity<?> actualizarCuentaCorriente(@RequestBody CuentaCorrienteDTO cuentaCorrienteDTO) {
+        return ResponseEntity.ok(cuentaCorrienteService.actualizarCuentaCorriente(cuentaCorrienteDTO));
+    }
+
+    @DeleteMapping("/eliminar-cuenta-corriente/{cuentaCorrienteId}")
+    public ResponseEntity<?> eliminarCuentaCorriente(@PathVariable Long cuentaCorrienteId) {
+        return ResponseEntity.ok(cuentaCorrienteService.eliminarCuentaCorriente(cuentaCorrienteId));
+    }
+
 }

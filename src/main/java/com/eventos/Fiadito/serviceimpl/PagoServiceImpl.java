@@ -3,6 +3,7 @@ package com.eventos.Fiadito.serviceimpl;
 import com.eventos.Fiadito.dtos.PagoDTO;
 import com.eventos.Fiadito.models.*;
 import com.eventos.Fiadito.repositories.*;
+import com.eventos.Fiadito.services.CuotaService;
 import com.eventos.Fiadito.services.PagoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class PagoServiceImpl implements PagoService {
 
     @Autowired
     private CuentaCorrienteRepository cuentaCorrienteRepository;
+
+    @Autowired
+    private CuotaService cuotaService;
 
     @Override
     public PagoDTO registrarPago(PagoDTO pagoDTO) {
@@ -98,7 +102,6 @@ public class PagoServiceImpl implements PagoService {
     public PagoDTO registrarPagoMontoEspecifico(PagoDTO pagoDTO) {
         // Validacion
         if (validarPago(pagoDTO)) {
-
             // Buscamos la deuda
             Optional<DeudaMensual> deudaEncontrada = deudaMensualRepository.findById(pagoDTO.getDeudaMensualId());
             // Buscamos la cuenta
@@ -118,6 +121,12 @@ public class PagoServiceImpl implements PagoService {
             // Si la deuda es igual a 0, entonces se cambia el estado de la deuda a pagada
             if (deudaEncontrada.get().getMonto() == 0) {
                 deudaEncontrada.get().setPagada(true);
+                cuotaService.obtenerCuotasPorDeudaMensual(deudaEncontrada.get().getId()).forEach(cuota -> {
+                    // Buscar la cuota
+                    Cuota cuotaEncontrada = cuotaRepository.findById(cuota.getId()).get();
+                    cuotaEncontrada.setPagada(true);
+                    cuotaRepository.save(cuotaEncontrada);
+                });
             }
             deudaMensualRepository.save(deudaEncontrada.get());
 

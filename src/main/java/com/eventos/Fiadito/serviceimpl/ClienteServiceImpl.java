@@ -111,7 +111,15 @@ public class ClienteServiceImpl implements ClienteService {
     //TODO: Actualizar datos cliente
     public ClienteDTO actualizarCliente(ClienteDTO clienteDTO) {
         // Buscar cuentaCorriente
-        CuentaCorriente cuentaCorriente = cuentaCorrienteRepository.findById(clienteDTO.getCuentaCorrienteId()).orElseThrow();
+
+        if (clienteDTO.getCuentaCorrienteId() != null) {
+            CuentaCorriente cuentaCorriente = cuentaCorrienteRepository.findById(clienteDTO.getCuentaCorrienteId()).orElseThrow();
+        }
+        // Verificar si el DNI ya está registrado
+        Cliente clienteExistente = clienteRepository.findByDni(clienteDTO.getDni());
+        if (clienteExistente != null && !clienteExistente.getId().equals(clienteDTO.getId())) {
+            throw new RuntimeException("El DNI ya existe");
+        }
 
         // Verificar si email aún está disponible
         Cliente clienteExistenteEmail = clienteRepository.findByEmail(clienteDTO.getEmail());
@@ -126,7 +134,10 @@ public class ClienteServiceImpl implements ClienteService {
         cliente.setEmail(clienteDTO.getEmail());
         cliente.setTelefono(clienteDTO.getTelefono());
         cliente.setEnMora(cliente.isEnMora());
-        cliente.setCuentaCorriente(cuentaCorriente);
+        if (clienteDTO.getCuentaCorrienteId() != null) {
+            CuentaCorriente cuentaCorriente = cuentaCorrienteRepository.findById(clienteDTO.getCuentaCorrienteId()).orElseThrow();
+            cliente.setCuentaCorriente(cuentaCorriente);
+        }
         cliente.setFechaRegistro(cliente.getFechaRegistro());
         cliente.setEstablecimiento(cliente.getEstablecimiento());
         cliente.setUsuario(cliente.getUsuario());

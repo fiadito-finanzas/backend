@@ -77,6 +77,43 @@ public class CuentaCorrienteServiceImpl implements CuentaCorrienteService {
         return cuentaCreada;
     }
 
+    @Override
+    public CuentaCorrienteDTO actualizarCuentaCorriente(CuentaCorrienteDTO cuentaCorrienteDTO){
+        Optional<CuentaCorriente> optionalCuentaCorriente = cuentaCorrienteRepository.findById(cuentaCorrienteDTO.getId());
+        if (optionalCuentaCorriente.isEmpty()) {
+            throw new IllegalArgumentException("Cuenta corriente no encontrada");
+        }
+
+        // Calcular nueva tasa de interes
+        double m = calcularCapitalizacion(cuentaCorrienteDTO.getPeriodoCapitalizacion().toLowerCase());
+        double n = m;
+        double TEP = 0.0;
+        if (cuentaCorrienteDTO.getTipoInteres().equals("Efectiva")) {
+            TEP = cuentaCorrienteDTO.getTasaInteres()*0.01;
+        }
+        else if (cuentaCorrienteDTO.getTipoInteres().equals("Nominal")) {
+            TEP = calcularTEP(cuentaCorrienteDTO.getTasaInteres(),m,n);
+        }
+        else {
+            throw new IllegalArgumentException("Tipo de interés no soportado: " + cuentaCorrienteDTO.getTipoInteres());
+        }
+
+        CuentaCorriente cuentaCorriente = optionalCuentaCorriente.get();
+        cuentaCorriente.setM(m);
+        cuentaCorriente.setN(n);
+        cuentaCorriente.setTEP(TEP);
+        cuentaCorriente.setTransacciones(cuentaCorriente.getTransacciones());
+        cuentaCorriente.setTasaInteres(cuentaCorrienteDTO.getTasaInteres());
+        cuentaCorriente.setTasaMoratoria(cuentaCorrienteDTO.getTasaMoratoria());
+        cuentaCorriente.setSaldoCredito(cuentaCorrienteDTO.getSaldoCredito());
+        cuentaCorriente.setFechaPagoMensual(cuentaCorrienteDTO.getFechaPagoMensual());
+        cuentaCorriente.setTipoInteres(cuentaCorrienteDTO.getTipoInteres());
+        cuentaCorriente.setPeriodoCapitalizacion(cuentaCorrienteDTO.getPeriodoCapitalizacion());
+        cuentaCorriente.setFechaUltimaActualizacion(new Date());
+        cuentaCorrienteRepository.save(cuentaCorriente);
+        return cuentaCorrienteDTO;
+    }
+
     public double calcularCapitalizacion(String periodo) {
         switch (periodo) {
             case "diario":
@@ -129,6 +166,17 @@ public class CuentaCorrienteServiceImpl implements CuentaCorrienteService {
 
         double tep = Math.pow(1 + (TN / m), n)-1;
         return tep;
+    }
+
+    @Override
+    public boolean eliminarCuentaCorriente(Long cuentaCorrienteId) {
+        Optional<CuentaCorriente> optionalCuentaCorriente = cuentaCorrienteRepository.findById(cuentaCorrienteId);
+        if (optionalCuentaCorriente.isEmpty()) {
+            throw new IllegalArgumentException("Cuenta corriente no encontrada");
+        }
+        CuentaCorriente cuentaCorriente = optionalCuentaCorriente.get();
+        cuentaCorrienteRepository.delete(cuentaCorriente);
+        return true;
     }
 
 }

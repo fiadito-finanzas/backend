@@ -21,7 +21,7 @@ public class Pago {
     @Column(nullable = false)
     private Date fechaPago;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
