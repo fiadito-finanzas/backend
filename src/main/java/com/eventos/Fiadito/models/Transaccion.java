@@ -31,4 +31,12 @@ public class Transaccion {
 
     @Column(nullable = false)
     private double totalMonto; // Monto total de la transacción, incluyendo intereses, si corresponde
+
+    @ManyToMany
+    @JoinTable(
+            name = "transaccion_producto",
+            joinColumns = @JoinColumn(name = "transaccion_id"),
+            inverseJoinColumns = @JoinColumn(name = "producto_id")
+    )
+    private List<Producto> productos;
 }

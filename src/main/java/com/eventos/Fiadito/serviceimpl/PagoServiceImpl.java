@@ -119,7 +119,7 @@ public class PagoServiceImpl implements PagoService {
             // Actualizamos la deuda
             deudaEncontrada.get().setMonto(deudaEncontrada.get().getMonto() - pagoDTO.getMonto());
             // Si la deuda es igual a 0, entonces se cambia el estado de la deuda a pagada
-            if (deudaEncontrada.get().getMonto() == 0) {
+            if (deudaEncontrada.get().getMonto() <= pago.getMonto()) {
                 deudaEncontrada.get().setPagada(true);
                 cuotaService.obtenerCuotasPorDeudaMensual(deudaEncontrada.get().getId()).forEach(cuota -> {
                     // Buscar la cuota

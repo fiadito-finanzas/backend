@@ -12,6 +12,7 @@ public interface TransaccionService {
 
     List<TransaccionDTO> obtenerTransaccionesPorCuentaCorriente(Long cuentaCorriente);
 
+    List<TransaccionDTO> obtenerTransacciones();
     //TODO: Obtener transaccion por ID
     Transaccion obtenerTransaccionPorId(Long transaccionId);
 

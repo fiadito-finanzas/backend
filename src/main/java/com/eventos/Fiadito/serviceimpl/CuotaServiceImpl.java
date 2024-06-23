@@ -1,6 +1,7 @@
 package com.eventos.Fiadito.serviceimpl;
 
 import com.eventos.Fiadito.dtos.CuotaDTO;
+import com.eventos.Fiadito.dtos.FlujoCuotaDTO;
 import com.eventos.Fiadito.models.CuentaCorriente;
 import com.eventos.Fiadito.models.Cuota;
 import com.eventos.Fiadito.models.DeudaMensual;
@@ -56,6 +57,29 @@ public class CuotaServiceImpl implements CuotaService {
         List<Cuota> cuotas = obtenerCuotasPorTransaccion(transacciones.get(0).getId());
 
         return cuotas;
+    }
+
+    public List<FlujoCuotaDTO> obtenerFlujosCuotas(Long transaccionId){
+        // Buscar cuotas de la transaccion
+        List<Cuota> cuotas = obtenerCuotasPorTransaccion(transaccionId);
+        // Construir DTO
+        List<FlujoCuotaDTO> flujoCuotaDTOs = new ArrayList<>();
+        for (Cuota cuota : cuotas) {
+            FlujoCuotaDTO flujoCuotaDTO = new FlujoCuotaDTO();
+            flujoCuotaDTO.setId(cuota.getId());
+            flujoCuotaDTO.setFechaVencimiento(cuota.getFechaVencimiento());
+            flujoCuotaDTO.setMonto(cuota.getMonto());
+            flujoCuotaDTO.setPagada(cuota.isPagada());
+            flujoCuotaDTO.setNumeroCuota((long) cuota.getNumeroCuota());
+            flujoCuotaDTO.setSaldoFlujo(cuota.getSaldoFlujo());
+            flujoCuotaDTO.setMontoAmortizacion(cuota.getMontoAmortizacion());
+            flujoCuotaDTO.setMontoInteres(cuota.getMontoInteres());
+            flujoCuotaDTO.setPeriodoGracia(cuota.getPeriodoGracia());
+            flujoCuotaDTO.setSaldoInicial(cuota.getSaldoInicial());
+            flujoCuotaDTO.setMontoCapital(cuota.getMontoCapital());
+            flujoCuotaDTOs.add(flujoCuotaDTO);
+        }
+        return flujoCuotaDTOs;
     }
 
     public List<CuotaDTO> obtenerCuotasPorDeudaMensual(Long deudaMensualId){

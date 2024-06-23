@@ -48,6 +48,9 @@ public class DeudaMensualServiceImpl implements DeudaMensualService {
             deudaMensualDTO.setFechaFinCiclo(deudaMensual.getFechaFinCiclo());
             deudaMensualDTO.setFechaPago(deudaMensual.getFechaFinCiclo());
             deudaMensualDTO.setMonto(deudaMensual.getMonto());
+            deudaMensualDTO.setInteres(deudaMensual.getInteres());
+            deudaMensualDTO.setId(deudaMensual.getId());
+            deudaMensualDTO.setPagada(deudaMensual.isPagada());
             deudasMensualesDTO.add(deudaMensualDTO);
         }
         return deudasMensualesDTO;
@@ -66,6 +69,7 @@ public class DeudaMensualServiceImpl implements DeudaMensualService {
             deudaMensualDTO.setMonto(deudaMensual.get().getMonto());
             deudaMensualDTO.setInteres(deudaMensual.get().getInteres());
             deudaMensualDTO.setId(deudaMensual.get().getId());
+            deudaMensualDTO.setPagada(deudaMensual.get().isPagada());
             return Optional.of(deudaMensualDTO);
         } else {
             return Optional.empty();

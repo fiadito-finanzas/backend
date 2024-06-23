@@ -42,4 +42,15 @@ public class Cuota {
     @Column(nullable = false)
     private String periodoGracia; // 'T' - 'P' - 'S'
 
+    @Column(nullable = false)
+    private double saldoFlujo;
+
+    @Column(nullable = false)
+    private double numeroCuota;
+
+    @Column(nullable = false)
+    private double saldoInicial;
+
+    @Column(nullable = false)
+    private double montoCapital;
 }

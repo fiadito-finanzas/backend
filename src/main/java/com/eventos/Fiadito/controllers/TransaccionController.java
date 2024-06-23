@@ -31,6 +31,13 @@ public class TransaccionController {
         return ResponseEntity.ok(transaccionService.obtenerTransaccionesPorEstablecimiento(establecimientoId));
     }
 
+    //Obtener transacciones
+    @GetMapping("/obtener-transacciones")
+    public ResponseEntity<?> obtenerTransacciones() {
+        return ResponseEntity.ok(transaccionService.obtenerTransacciones());
+    }
+
+
     //Obtener transaccion
     @GetMapping("/obtener-transaccion/{transaccionId}")
     public ResponseEntity<?> obtenerTransaccion(@PathVariable Long transaccionId) {

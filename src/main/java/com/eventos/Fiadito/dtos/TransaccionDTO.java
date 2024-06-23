@@ -14,6 +14,7 @@ public class TransaccionDTO {
     private String tipo; // Puede ser COMPRA o COMPRA_A_CUOTAS
     private double interes;
     private int cuotas;
+    private List<ProductoCompraDTO> productos; // Lista de IDs de productos asociados a la transacción
     private int cantidadPlazoGraciaT;
     private int cantidadPlazoGraciaP;
 }

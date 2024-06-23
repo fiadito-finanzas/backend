@@ -1,6 +1,7 @@
 package com.eventos.Fiadito.controllers;
 
 import com.eventos.Fiadito.dtos.CuotaDTO;
+import com.eventos.Fiadito.dtos.FlujoCuotaDTO;
 import com.eventos.Fiadito.models.Cuota;
 import com.eventos.Fiadito.services.CuotaService;
 import jakarta.persistence.Id;
@@ -20,8 +21,8 @@ public class CuotaController {
 
     // TODO: obtenerCuotasPorTransaccion
     @GetMapping("/obtener-cuotas-por-transaccion/{transaccionId}")
-    public List<Cuota> obtenerCuotasPorTransaccion(@PathVariable Long transaccionId){
-        return cuotaService.obtenerCuotasPorTransaccion(transaccionId);
+    public List<FlujoCuotaDTO> obtenerCuotasPorTransaccion(@PathVariable Long transaccionId){
+        return cuotaService.obtenerFlujosCuotas(transaccionId);
     }
 
     // TODO: obtenerCuotasPorDeudaMensual

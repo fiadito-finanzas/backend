@@ -1,5 +1,6 @@
 package com.eventos.Fiadito.serviceimpl;
 
+import com.eventos.Fiadito.dtos.ProductoCompraDTO;
 import com.eventos.Fiadito.dtos.TransaccionDTO;
 import com.eventos.Fiadito.models.*;
 import com.eventos.Fiadito.repositories.*;
@@ -9,6 +10,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,12 @@ public class TransaccionServiceImpl implements TransaccionService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private ProductoRepository productoRepository;
+
+    @Autowired
+    private TransaccionProductoRepository transaccionProductoRepository;
+
     public TransaccionDTO registrarTransaccion(TransaccionDTO transaccionDTO) {
         Optional<CuentaCorriente> optionalCuentaCorriente = cuentaCorrienteRepository.findById(transaccionDTO.getCuentaCorrienteId());
         if (optionalCuentaCorriente.isEmpty()) {
@@ -45,17 +53,28 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         // Verificar si la transacción es COMPRA
         if (transaccionDTO.getTipo().equals("COMPRA")) {
-            Double intereses = calcularInteres(transaccionDTO.getMonto(), cuentaCorriente.getTEP());
-            Double montoTotal = calcularMontoTotal(transaccionDTO.getMonto(), intereses);
+            Double montoProductos = 0.00;
+            for (ProductoCompraDTO productocompra : transaccionDTO.getProductos()) {
+                Producto producto = productoRepository.findById(productocompra.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Producto con ID " + productocompra + " no encontrado"));
+                montoProductos += producto.getPrecio() * productocompra.getCantidad();
+                if (productocompra.getCantidad() <= 0) {
+                    throw new IllegalArgumentException("Cantidad inválida");
+                }
+            }
+            Double intereses = calcularInteres(montoProductos, cuentaCorriente.getTEP());
+            Double montoTotal = calcularMontoTotal(montoProductos, intereses);
+
             // Crear transaccion
             Transaccion transaccion = new Transaccion();
             transaccion.setCuentaCorriente(cuentaCorriente);
             transaccion.setFecha(new Date());
-            transaccion.setMonto(transaccionDTO.getMonto());
+            transaccion.setMonto(montoTotal);
             transaccion.setInteres(intereses);
             transaccion.setTotalMonto(montoTotal);
             transaccion.setTipo(transaccionDTO.getTipo());
             transaccionRepository.save(transaccion);
+
 
             // Actualizar saldo de la cuenta corriente
             cuentaCorriente.setSaldoCredito(cuentaCorriente.getSaldoCredito() - montoTotal);
@@ -102,7 +121,26 @@ public class TransaccionServiceImpl implements TransaccionService {
                 deudaMensual.setFechaTransaccion(new Date());
                 deudaMensualRepository.save(deudaMensual);
             }
+            // Añadir transaccion a cuenta corriente
+            cuentaCorriente.getTransacciones().add(transaccion);
+            cuentaCorrienteRepository.save(cuentaCorriente);
+            // Asociar productos a la transaccion
+            if (transaccionDTO.getProductos() != null && !transaccionDTO.getProductos().isEmpty()) {
+                for (ProductoCompraDTO productoId : transaccionDTO.getProductos()) {
+                    Producto producto = productoRepository.findById(productoId.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Producto con ID " + productoId + " no encontrado"));
 
+                    // Crear TransaccionProducto
+                    TransaccionProducto transaccionProducto = new TransaccionProducto();
+                    transaccionProducto.setTransaccion(transaccion);
+                    transaccionProducto.setProducto(producto);
+                    transaccionProducto.setCantidad(productoId.getCantidad()); // Ajusta la cantidad según tus necesidades
+
+                    // Guardar TransaccionProducto en la base de datos
+                    transaccionProductoRepository.save(transaccionProducto);
+
+                }
+            }
             // Crear el DTO
             TransaccionDTO nuevatransaccion = new TransaccionDTO();
             nuevatransaccion.setId(transaccion.getId());
@@ -170,11 +208,21 @@ public class TransaccionServiceImpl implements TransaccionService {
                 throw new IllegalArgumentException("Número de cuotas inválido");
             }
 
+            // Calcular el saldo de inicio en base a los productos y cantidades
+            Double montoProductos = 0.00;
+            for (ProductoCompraDTO productocompra : transaccionDTO.getProductos()) {
+                Producto producto = productoRepository.findById(productocompra.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Producto con ID " + productocompra + " no encontrado"));
+                montoProductos += producto.getPrecio() * productocompra.getCantidad();
+                if (productocompra.getCantidad() <= 0) {
+                    throw new IllegalArgumentException("Cantidad inválida");
+                }
+            }
             // Crear la transacción
             Transaccion transaccion = new Transaccion();
             transaccion.setCuentaCorriente(cuentaCorriente);
             transaccion.setFecha(new Date());
-            transaccion.setMonto(transaccionDTO.getMonto());
+            transaccion.setMonto(montoProductos);
             transaccion.setInteres(0.00);
             transaccion.setTotalMonto(0.00);
             transaccion.setTipo(transaccionDTO.getTipo());
@@ -182,7 +230,7 @@ public class TransaccionServiceImpl implements TransaccionService {
             // Añadir transaccion a cuentacorriente
             cuentaCorriente.getTransacciones().add(transaccion);
             // Actualizar saldo de la cuenta corriente
-            cuentaCorriente.setSaldoCredito(cuentaCorriente.getSaldoCredito() - transaccionDTO.getMonto());
+            cuentaCorriente.setSaldoCredito(cuentaCorriente.getSaldoCredito() - montoProductos);
             Calendar fechaVencimiento = Calendar.getInstance();
             fechaVencimiento.setTime(cuentaCorriente.getFechaPagoMensual());
             Calendar fechaInicioCiclo = Calendar.getInstance();
@@ -212,7 +260,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
                 if (i == 0) {
                     // Calcular el saldo inicial
-                    saldoInicial = transaccionDTO.getMonto();
+                    saldoInicial = montoProductos;  // Se considera el monto de los productos
                 } else {
                     // Calcular el saldo inicial
                     saldoInicial = saldoFinal;
@@ -245,6 +293,10 @@ public class TransaccionServiceImpl implements TransaccionService {
                 cuotaObj.setPeriodoGracia(gracia);
                 cuotaObj.setMontoInteres(interes);
                 cuotaObj.setMontoAmortizacion(amortizacion);
+                cuotaObj.setSaldoFlujo(saldoFinal);
+                cuotaObj.setNumeroCuota(cuota);
+                cuotaObj.setSaldoInicial(saldoInicialIndexado);
+                cuotaObj.setMontoCapital(montoProductos);
                 // Guardar la cuota
                 cuotaRepository.save(cuotaObj);
                 // Validar si existe DeudaMensual, si no existe crearlo. Luego, añadir el monto de la cuota correspondiente
@@ -286,6 +338,26 @@ public class TransaccionServiceImpl implements TransaccionService {
                 transaccionRepository.save(transaccion);
             }
 
+// Asociar productos a la transaccion
+            if (transaccionDTO.getProductos() != null && !transaccionDTO.getProductos().isEmpty()) {
+                for (ProductoCompraDTO productoId : transaccionDTO.getProductos()) {
+                    Producto producto = productoRepository.findById(productoId.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Producto con ID " + productoId + " no encontrado"));
+
+                    // Crear TransaccionProducto
+                    TransaccionProducto transaccionProducto = new TransaccionProducto();
+                    transaccionProducto.setTransaccion(transaccion);
+                    transaccionProducto.setProducto(producto);
+                    transaccionProducto.setCantidad(productoId.getCantidad()); // Ajusta la cantidad según tus necesidades
+
+                    // Guardar TransaccionProducto en la base de datos
+                    transaccionProductoRepository.save(transaccionProducto);
+
+                }
+            }
+            // Añadir transaccion a cuenta corriente
+            cuentaCorriente.getTransacciones().add(transaccion);
+            cuentaCorrienteRepository.save(cuentaCorriente);
             // Construir DTO
             TransaccionDTO nuevatransaccion = new TransaccionDTO();
             nuevatransaccion.setId(transaccion.getId());
@@ -340,6 +412,43 @@ public class TransaccionServiceImpl implements TransaccionService {
             transaccionDTO.setTipo(transaccion.getTipo());
             transaccionDTO.setInteres(transaccion.getInteres());
             transaccionDTO.setCuotas(cuotas);
+            transaccionDTO.setId(transaccion.getId());
+            transaccionDTO.setCantidadPlazoGraciaT(cantidadPlazoGraciaT);
+            transaccionDTO.setCantidadPlazoGraciaP(cantidadPlazoGraciaP);
+            return transaccionDTO;
+        }).collect(Collectors.toList());
+        return transaccionesDTO;
+    }
+
+    public List<TransaccionDTO> obtenerTransacciones() {
+        List<Transaccion> transacciones = transaccionRepository.findAll();
+        // Convertir en DTO las transacciones
+        List<TransaccionDTO> transaccionesDTO = transacciones.stream().map(transaccion -> {
+            // Contar las cuotas que tiene la transacción si es de tipo CUOTA_A_CUOTAS
+            int cuotas = 0;
+            int cantidadPlazoGraciaT = 0;
+            int cantidadPlazoGraciaP = 0;
+            if (transaccion.getTipo().equals("COMPRA_A_CUOTAS")) {
+                cuotas = cuotaRepository.findByTransaccionId(transaccion.getId()).size();
+                // Contar cuotas con plazo gracia T
+                // Buscar cuotas
+                List<Cuota> cuotasList = cuotaRepository.findByTransaccionId(transaccion.getId());
+                for (Cuota cuota : cuotasList) {
+                    if (cuota.getPeriodoGracia().equals("T")) {
+                        cantidadPlazoGraciaT++;
+                    } else if (cuota.getPeriodoGracia().equals("P")) {
+                        cantidadPlazoGraciaP++;
+                    }
+                }
+            }
+            TransaccionDTO transaccionDTO = new TransaccionDTO();
+            transaccionDTO.setCuentaCorrienteId(transaccion.getCuentaCorriente().getId());
+            transaccionDTO.setFecha(transaccion.getFecha());
+            transaccionDTO.setMonto(transaccion.getMonto());
+            transaccionDTO.setTipo(transaccion.getTipo());
+            transaccionDTO.setInteres(transaccion.getInteres());
+            transaccionDTO.setCuotas(cuotas);
+            transaccionDTO.setId(transaccion.getId());
             transaccionDTO.setCantidadPlazoGraciaT(cantidadPlazoGraciaT);
             transaccionDTO.setCantidadPlazoGraciaP(cantidadPlazoGraciaP);
             return transaccionDTO;
@@ -410,6 +519,18 @@ public class TransaccionServiceImpl implements TransaccionService {
         return cuentaCorriente.getSaldoCredito() >= monto;
     }
 
+    private void asociarProductos(TransaccionDTO transaccionDTO, Transaccion transaccion) {
+        List<Producto> productos = transaccionDTO.getProductos().stream().map(productoId -> {
+            Optional<Producto> optionalProducto = productoRepository.findById(productoId.getId());
+            if (optionalProducto.isEmpty()) {
+                throw new IllegalArgumentException("Producto no encontrado");
+            }
+            return optionalProducto.get();
+        }).collect(Collectors.toList());
+
+        transaccion.setProductos(productos);
+        transaccionRepository.save(transaccion);
+    }
     // Leasing Francés
     // Calcular saldo inicial
 

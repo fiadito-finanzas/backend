@@ -1,6 +1,7 @@
 package com.eventos.Fiadito.services;
 
 import com.eventos.Fiadito.dtos.CuotaDTO;
+import com.eventos.Fiadito.dtos.FlujoCuotaDTO;
 import com.eventos.Fiadito.models.Cuota;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,9 @@ public interface CuotaService {
 
     //TODO: Obtener cuotas por transaccion
     List<Cuota> obtenerCuotasPorTransaccion(Long transaccionId);
+
+    //TODO: Obtener flujos cuotas
+    List<FlujoCuotaDTO> obtenerFlujosCuotas(Long transaccionId);
 
     //TODO: Obtener cuota
     Cuota obtenerCuota(Long cuotaId);
