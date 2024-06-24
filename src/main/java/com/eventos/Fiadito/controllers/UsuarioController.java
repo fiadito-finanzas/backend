@@ -62,6 +62,10 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.obtenerUsuario(usuarioId));
     }
 
-
+    //JWT Verify
+    @PostMapping("/jwt/verify")
+    public ResponseEntity<?> verifyToken(@RequestBody String token) {
+        return ResponseEntity.ok(jwtService.verifyToken(token));
+    }
 
 }

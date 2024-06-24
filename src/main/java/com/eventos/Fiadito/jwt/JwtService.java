@@ -1,6 +1,5 @@
 package com.eventos.Fiadito.jwt;
 
-import com.eventos.Fiadito.dtos.AuthResponseDTO;
 import com.eventos.Fiadito.security.SecurityUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -59,9 +58,9 @@ public class JwtService {
         return expiration.before(new Date());
     }
 
-    public boolean verify(AuthResponseDTO token) {
+    public boolean verifyToken(String token) {
         try {
-            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token.token);
+            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
