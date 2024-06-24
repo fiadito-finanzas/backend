@@ -83,8 +83,11 @@ public class PagoServiceImpl implements PagoService {
         }
 
         if (pagoDTO.getMonto() > deudaEncontrada.get().getMonto()) {
-            throw new RuntimeException("El monto del pago no puede ser mayor al monto de la deuda");
-
+            // Setear la deuda en 0
+            deudaEncontrada.get().setMonto(0);
+            // Setear la deuda como pagada
+            deudaEncontrada.get().setPagada(true);
+            deudaMensualRepository.save(deudaEncontrada.get());
         }
 
         // Validar la cuota existe
